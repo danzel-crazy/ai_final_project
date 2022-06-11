@@ -3,6 +3,7 @@
 '''
 公众号：Python代码大全
 '''
+from numpy import number
 import pygame
 import game
 from random import choice, randint
@@ -33,8 +34,9 @@ class Barrier(object):
             self.type = choice(CHOICE)
         else:
             self.type = opt
+        # print(self.type)
         self.frag_touch = False
-        self.frag_time = 12
+        self.frag_time = 30
         self.score = False
         self.belt_dire = 0
         self.belt_dire = pygame.K_LEFT if self.type == BELT_LEFT else pygame.K_RIGHT
@@ -142,7 +144,7 @@ class Hell(game.Game):
             self.barrier.append(Barrier(self.screen, SOLID))
         else:
             self.barrier.append(Barrier(self.screen))
-        self.last = randint(3, 5) * SIDE
+        self.last = randint(2, 4) * SIDE
 
     def update(self, current_time):
         if self.end or self.is_pause:
@@ -156,7 +158,7 @@ class Hell(game.Game):
                 if ba.type == FRAGILE and ba.rect.top > 0:
                     self.score += 1
                 self.barrier.remove(ba)
-
+        # print(len(self.barrier))
         self.move_man(self.dire)
         self.move_man(self.dire)
         self.to_hell()
