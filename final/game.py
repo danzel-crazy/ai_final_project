@@ -1,9 +1,5 @@
-#!python3
-# -*- coding: utf-8 -*-
-'''
-公众号：Python代码大全
-'''
 import pygame
+import random
 from pygame.locals import *
 from sys import exit
 
@@ -33,12 +29,14 @@ class Game(object):
         self.timer = pygame.time.Clock()
         self.fps = fps
         self.score = 0
+        self.life = 10;
         self.end = False
         self.fullscreen = False
         self.last_time = pygame.time.get_ticks()
         self.is_pause = False
         self.is_draw = True
         self.score_font = pygame.font.SysFont("Calibri", 130, True)
+        self.life_font = pygame.font.SysFont("Calibri", 30, True)
 
     def bind_key(self, key, action):
         if isinstance(key, list):
@@ -82,13 +80,39 @@ class Game(object):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button in self.clicks.keys():
                 self.clicks[event.button](*event.pos)
+    
+    def auto_input(self):
+        auto_type_D = pygame.KEYDOWN
+        auto_type_U = pygame.KEYUP
+        auto_key_L = pygame.K_LEFT
+        auto_key_R = pygame.K_RIGHT
+        
+        if(self.end == False):
+            type = random.randint(1,10)
+            if(type > 5):
+                if auto_key_L in self.keys.keys():
+                        self.keys[auto_key_L](auto_key_L)
+            else :
+                if auto_key_R in self.keys.keys():
+                        self.keys[auto_key_R](auto_key_R)
+
+        # if event.type == pygame.KEYDOWN:
+        #     if event.key in self.keys.keys():
+        #         self.keys[event.key](event.key)
+        # if event.type == pygame.KEYUP:
+        #     if event.key in self.keys_up.keys():
+        #         self.keys_up[event.key](event.key)
 
     def run(self):
         while True:
+            # print(pygame.event.get())
             for event in pygame.event.get():
                 self.handle_input(event)
-            self.timer.tick(self.fps)
+            # if(self.end == False): 
+            #     self.auto_input();
 
+            self.timer.tick(self.fps)
+            # self.timer.tick(30)
             self.update(pygame.time.get_ticks())
             self.draw(pygame.time.get_ticks())
 
@@ -98,6 +122,15 @@ class Game(object):
             r = self.screen.get_rect()
             rect = score.get_rect(center=r.center)
         self.screen.blit(score, rect)
+
+    def draw_life(self, color, rect):
+        l = int(self.life)
+        life = self.life_font.render(str(l), True, color)
+        # if rect is None:
+        #     r = self.screen.get_rect()
+        #     rect = life.get_rect(center=r.center)
+        
+        self.screen.blit(life, rect)
 
     def is_end(self):
         return self.end

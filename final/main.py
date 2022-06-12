@@ -1,12 +1,7 @@
-#!python3
-# -*- coding: utf-8 -*-
-'''
-公众号：Python代码大全
-'''
 import pygame
 import game
 from random import choice, randint
-
+from numpy import random
 SCORE = 0
 SOLID = 1
 FRAGILE = 2
@@ -17,14 +12,13 @@ BODY = 6
 
 GAME_ROW = 40
 GAME_COL = 28
-OBS_WIDTH = GAME_COL // 4
+OBS_WIDTH = GAME_COL // 4 #	取整除 - 返回商的整数部分（向下取整）
 SIDE = 13
 SCREEN_WIDTH = SIDE*GAME_COL
 SCREEN_HEIGHT = SIDE*GAME_ROW
 COLOR = {SOLID: 0x00ffff, FRAGILE: 0xff5500, DEADLY: 0xff2222, SCORE: 0xcccccc,
         BELT_LEFT: 0xffff44, BELT_RIGHT: 0xff99ff, BODY: 0x00ff00}
 CHOICE = [SOLID, SOLID, SOLID, FRAGILE, FRAGILE, BELT_LEFT, BELT_RIGHT, DEADLY]
-
 
 class Barrier(object):
     def __init__(self, screen, opt=None):
@@ -33,6 +27,7 @@ class Barrier(object):
             self.type = choice(CHOICE)
         else:
             self.type = opt
+
         self.frag_touch = False
         self.frag_time = 12
         self.score = False
@@ -65,6 +60,7 @@ class Barrier(object):
             p2 = (x, y + SIDE)
             p3 = (x + SIDE, y + SIDE)
             points = [p1, p2, p3]
+            rect = pygame.Rect(x, y, SIDE, SIDE)
             pygame.draw.polygon(self.screen, COLOR[DEADLY], points)
 
     def draw(self):
@@ -117,13 +113,19 @@ class Hell(game.Game):
 
     def to_hell(self):
         self.body.top += 2
+        # print(len(self.barrier))
         for ba in self.barrier:
             if not self.body.colliderect(ba.rect):
                 self.get_score(ba)
                 continue
             if ba.type == DEADLY:
-                self.show_end()
-                return
+                # ba.frag_touch = False
+                self.life = self.life-0.05;
+                # print(self.life)
+                
+                if(self.life <= 0) :
+                    self.show_end()
+                # return
             self.body.top = ba.rect.top - SIDE - 2
             if ba.type == FRAGILE:
                 ba.frag_touch = True
@@ -145,6 +147,7 @@ class Hell(game.Game):
         self.last = randint(3, 5) * SIDE
 
     def update(self, current_time):
+        print(self.body)
         if self.end or self.is_pause:
             return
         self.last -= 1
@@ -166,6 +169,8 @@ class Hell(game.Game):
             return
         self.screen.fill(0x000000)
         self.draw_score((0x3c, 0x3c, 0x3c))
+        life_rect = pygame.Rect(50, 50, SIDE, SIDE)
+        self.draw_life((0xDC, 0x14, 0x3C), life_rect)
         for ba in self.barrier:
             ba.draw()
         if not end:
@@ -174,8 +179,37 @@ class Hell(game.Game):
             self.screen.fill(COLOR[DEADLY], self.body)
         pygame.display.update()
 
+    def get_body(self):
+        return self.body
+    
+    def get_barrier(self):
+        return self.barrier
 
 if __name__ == '__main__':
     hell = Hell("是男人就下一百层", (SCREEN_WIDTH, SCREEN_HEIGHT))
     hell.run()
+while True: 
+    for event in pygame.event.get():
+        hell.handle_input(event)
+
+    def Max_Value (gameState, d):
+        if gameState.end or d == gameState.depth:
+            return gameState.tget_score()
+        temp=[]
+        for action in gameState.legalmove() :
+            gameState1=gameState
+            gameState1.move_man(action)
+            temp.append(Max_Value(gameState1, d+1))
+        return max(temp)
+
+
+    temp=[]
+    for i in hell.legalmove():
+        hell1=hell
+        hell1.move_man(i)
+        temp.append(Max_Value(hell1,0))
+
+    maxscore=max(temp)
+    bestIndices = [index for index in range(len(temp)) if temp[index] == maxscore]
+    chosenIndex = random.choice(bestIndices)
 
