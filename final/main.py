@@ -27,9 +27,8 @@ class Barrier(object):
             self.type = choice(CHOICE)
         else:
             self.type = opt
-
         self.frag_touch = False
-        self.frag_time = 12
+        self.frag_time = 30
         self.score = False
         self.belt_dire = 0
         self.belt_dire = pygame.K_LEFT if self.type == BELT_LEFT else pygame.K_RIGHT
@@ -144,7 +143,7 @@ class Hell(game.Game):
             self.barrier.append(Barrier(self.screen, SOLID))
         else:
             self.barrier.append(Barrier(self.screen))
-        self.last = randint(3, 5) * SIDE
+        self.last = randint(2, 4) * SIDE
 
     def update(self, current_time):
         print(self.body)
@@ -159,7 +158,7 @@ class Hell(game.Game):
                 if ba.type == FRAGILE and ba.rect.top > 0:
                     self.score += 1
                 self.barrier.remove(ba)
-
+        # print(len(self.barrier))
         self.move_man(self.dire)
         self.move_man(self.dire)
         self.to_hell()
