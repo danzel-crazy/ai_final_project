@@ -306,7 +306,7 @@ class gameState:
         if self.new_kid_pos != None:
             self.new_kid_pos = [self.new_kid_pos[0], self.new_kid_pos[1] + 2, self.new_kid_pos[2], self.new_kid_pos[3]]
         self.end = current[4]
-        # left, to top, 
+        # left, to top,... 
     def new_create(self):
         # print(self.barrier)
         if self.new_barrier_pos != None :
@@ -330,37 +330,88 @@ target_left=182
 dir = 0
 current = 0
 index = 2
-while True:       
+
+def EvaluationFunction(curState):
+    curPos = curState.getKidPosition()
+    newState = curState.getNextState(curState)
+    newPos = newState.getKidPosition()
+    mindist = 1e5
+    maxheight = -1
+    for ba in hell.barrier:
+        if ba.type in [SOLID, BELT_LEFT, BELT_RIGHT]:
+            dist = abs(ba.left, newPos)
+            if mindist < dist:
+                mindist = dist
+            if ba.rec.top > maxheight:
+                maxheight = ba.rec.top
+    
+    total = 100 * maxheight + mindist
+    return total
+    
+def minimax(gameState, depth):
+    if depth == gameState.depth:
+        return EvaluationFunction(gameState)
+    else:
+        return Max_Value(gameState, depth)   
+
+
+def reward(pos, hell):
+    for ba in hell.barrier:
+        if ba.type in [SOLID, BELT_LEFT, BELT_RIGHT]:
+            if ba.rect.left - 10 <= pos[0] <= ba.rect.left + 80:
+                if ba.type == SOLID:
+                    reward = 2
+                elif ba.type == BELT_LEFT:
+                    reward = 1
+                elif ba.type == BELT_RIGHT:
+                    reward = 1
+            else:
+                div = abs(hell.body.left - ba.rect.left - 39.5)
+                # if div == 0:
+                #     return -1
+                reward = 1 / div
+    if hell.body.top < 150:
+        reward = -1
+    
+    return reward
+
+
+current = [hell.kid_pos, hell.barrier_pos, hell.new_kid_pos, hell.new_barrier_pos, hell.end, hell.score]
+# print(current)
+# for event in pygame.event.get():
+#     hell.handle_input(event)
+def Max_Value (game, d):
+    best_action = None
+    best_score = None
+    # print(type(game))
+    if game.end or d == game.depth:
+        return game.tget_score()
+    temp = []
+    maxReward = -2
+    for action in game.legalmove() :
+        copiedState = copy.deepcopy(game) 
+        copiedState.move_man(action)
+        # copiedState.update()
+        # copiedState.new_create()
+        state = [copiedState.new_kid_pos, copiedState.new_barrier_pos, copiedState.kid_pos, copiedState.barrier_pos, hell.end, copiedState.score]
+        # print(state)
+        next_state = gameState()
+        next_state.getNextState(state)
+        curReward = reward(next_state.kid_pos, hell)
         
-        
-    current = [hell.kid_pos, hell.barrier_pos, hell.new_kid_pos, hell.new_barrier_pos, hell.end, hell.score]
-    # print(current)
-    # for event in pygame.event.get():
-    #     hell.handle_input(event)
-    def Max_Value (game, d):
-        best_action = None
-        best_score = None
-        # print(type(game))
-        if game.end or d == game.depth:
-            return game.tget_score()
-        temp = []
-        for action in game.legalmove() :
-            # gameState1 = hell
-            # gameState1.move_man(action)
-            # print(action)
-            gameState1 = copy.deepcopy(game) 
-            gameState1.move_man(action)
-            # gameState1.update()
-            # gameState1.new_create()
-            state = [gameState1.new_kid_pos, gameState1.new_barrier_pos, gameState1.kid_pos, gameState1.barrier_pos, hell.end, gameState1.score]
-            # print(state)
-            next_state = gameState()
-            next_state.getNextState(state)
+        if curReward > maxReward:
+            maxReward = curReward
             best_action = action
-            temp.append([best_action, Max_Value(next_state, d+1)])
-        return temp
+        if curReward == -1 and next_state.kid_pos[0] < 175:
+            best_action = 1
+        elif curReward == -1 and next_state.kid_pos[0] >= 175
+        
+        :
+            best_action = -1
+        temp.append([best_action, Max_Value(next_state, d+1)])
+    return temp
 
-
+while True: 
     temp=[]
     # for i in hell.legalmove():
     #     hell1= deepcopy(hell)
@@ -369,7 +420,7 @@ while True:
     g = gameState()
     g.getNextState(current)
     # print(type(g))
-    temp = Max_Value(g, 0)
+    temp = minimax(g, 0)
     # print(temp)
     maxscore = None
     for i in temp:
@@ -378,16 +429,8 @@ while True:
     bestIndices = [index for index in temp if index[1] == maxscore]
     # print(bestIndices)
     chosenIndex = random.choice(bestIndices)
-    print(chosenIndex[0])
+    # print(chosenIndex[0])
     hell.move_man(chosenIndex[0])
     hell.timer.tick(hell.fps)
     hell.update()
     hell.draw()
-   
-
-
-
-
-
-
-
