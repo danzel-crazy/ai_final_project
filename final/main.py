@@ -109,6 +109,7 @@ class Hell(game.Game):
         if self.body.top > ba.rect.top and not ba.score:
             self.score += 1
             ba.score = True
+        
 
     def to_hell(self):
         self.body.top += 2
@@ -143,7 +144,7 @@ class Hell(game.Game):
             self.barrier.append(Barrier(self.screen, SOLID))
         else:
             self.barrier.append(Barrier(self.screen))
-        self.last = randint(2, 4) * SIDE
+        self.last = randint(3, 4) * SIDE
 
     def update(self, current_time):
         print(self.body)
