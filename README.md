@@ -1,4 +1,4 @@
-A [DownstairKid(NS-SHAFT)](https://www.nagi-p.com/v1/fre/nsshaft.html) AI based on Deep Q-learning.
+A [DownstairKid(NS-SHAFT)] AI based on Adversarial learning and greedy algorithm.
 
 ## Requirements
 * wine
