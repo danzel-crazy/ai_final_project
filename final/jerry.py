@@ -3,12 +3,11 @@
 '''
 公众号：Python代码大全
 '''
-import copy 
+from copy import copy, deepcopy
 import pygame
 import game
 from random import choice, randint
 import random
-import numpy as np
 SCORE = 0
 SOLID = 1
 FRAGILE = 2
@@ -26,6 +25,7 @@ SCREEN_HEIGHT = SIDE*GAME_ROW
 COLOR = {SOLID: 0x00ffff, FRAGILE: 0xff5500, DEADLY: 0xff2222, SCORE: 0xcccccc,
         BELT_LEFT: 0xffff44, BELT_RIGHT: 0xff99ff, BODY: 0x00ff00}
 CHOICE = [SOLID, SOLID, SOLID, FRAGILE, FRAGILE, BELT_LEFT, BELT_RIGHT, DEADLY]
+
 
 class Barrier(object):
     def __init__(self, screen, opt=None):
@@ -84,26 +84,6 @@ class Hell(game.Game):
         self.bind_key([pygame.K_LEFT, pygame.K_RIGHT], self.move)
         self.bind_key_up([pygame.K_LEFT, pygame.K_RIGHT], self.unmove)
         self.bind_key(pygame.K_SPACE, self.pause)
-        self.kid_pos = [self.body[0], self.body[1], self.body[2], self.body[3]]
-        self.barrier_pos = None
-        self.new_kid_pos = [self.body[0], self.body[1]-2, self.body[2], self.body[3]]
-        self.new_barrier_pos = None
-
-    def create(self):
-        # print(self.barrier)
-        temp  = []
-        for ba in self.barrier:
-                temp.append([ba.type, ba.rect.left, ba.rect.top, 91])
-                # print(temp)
-        self.barrier_pos = temp
-    
-    def new_create(self):
-        # print(self.barrier)
-        temp  = []
-        for ba in self.barrier:
-            if(ba.rect.top-2 > SIDE):
-                temp.append([ba.type, ba.rect.left, ba.rect.top-2, 91])
-        self.new_barrier_pos =  temp
 
     def deepCopy(self):
         state = Hell('copy',(SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -117,7 +97,7 @@ class Hell(game.Game):
         self.dire = 0
 
     def show_end(self):
-        self.draw(0, end=True)
+        self.score-=100
         self.end = True
 
     def move_man(self, dire):
@@ -137,25 +117,12 @@ class Hell(game.Game):
         return True
 
 
-    # def legalmove(self):
-    #     temp=[]
-    #     rect = deepcopy(self.body)
-    #     # print(rect)  
-    #     if(rect.left==0):
-    #         temp=[0,1]
-    #     elif(rect.left + SIDE+1 >= SCREEN_WIDTH):
-    #         temp=[0,-1]
-    #     else:          
-    #         temp=[0,1,-1]
-    #     return temp
-
     def legalmove(self):
         temp=[]
-        # state = deepcopy(self)
-        # print(rect)  
-        if(self.body.left==0):
+        rect = self.body.copy()
+        if(rect.left==0):
             temp=[0,1]
-        elif(self.body.left + SIDE+1 >= SCREEN_WIDTH):
+        elif(rect.left + SIDE+1 >= SCREEN_WIDTH):
             temp=[0,-1]
         else:          
             temp=[0,1,-1]
@@ -208,25 +175,21 @@ class Hell(game.Game):
 
 
     def update(self):
-        # print(self.barrier_pos)
         if self.end or self.is_pause:
             return
         self.last -= 1
         if self.last == 0:
             self.create_barrier()
-        
+
         for ba in self.barrier:
             if not ba.rise():
                 if ba.type == FRAGILE and ba.rect.top > 0:
                     self.score += 1
                 self.barrier.remove(ba)
-        self.create()
-        self.new_create()
         self.move_man(self.dire)
         self.move_man(self.dire)
         
         self.to_hell()
-        
 
     def draw(self, end=False):
         if self.end or self.is_pause:
@@ -246,139 +209,65 @@ class Hell(game.Game):
         pygame.display.update()
 
 
-class gameState:
-    def __init__(self):
-        self.end = 0
-        self.depth = 5
-        self.kid_pos = None
-        self.barrier_pos = None
-        self.new_kid_pos = None
-        self.new_barrier_pos = None
-        self.score = 0
-
-    def legalmove(self):
-        temp=[]
-        # print(rect)  
-        # self.end = game.show_end()
-        if(self.new_kid_pos == None) :
-            return [0,1,-1]
-        else:
-            if(self.new_kid_pos[0]==0):
-                temp=[0,1]
-            elif(self.new_kid_pos[0] + SIDE+1 >= SCREEN_WIDTH):
-                temp=[0,-1]
-            else:          
-                temp=[0,1,-1]
-            
-            # print(temp)
-            return temp
-    def move_man(self, action):
-        self.new_kid_pos[0] += action
-        
-        return self
-
-    def tget_score(self):
-        score = 0
-        # if self.bar_state[1]:
-        #     for ba in self.bar_state[1]:
-        #         if (ba[0] == DEADLY & (self.kid_state[1][1] - ba[2]) < 25):
-        #             score += 100
-        #         else:
-        #             score += 1
-        # print(self.new_kid_pos[0])
-        # print(self.kid_pos[0])
-        # print(score)
-        # if(self.new_kid_pos[0] < self.kid_pos[0]):
-        #     score -= 100 
-        # elif(self.new_kid_pos[0] > self.kid_pos[0]):
-        #     score += 100
-        # print(score)
-        return self.score
-
-    def update(self):
-        self.kid_pos = self.new_kid_pos
-        self.barrier_pos = self.new_barrier_pos
-        if self.new_kid_pos != None :
-            self.new_kid_pos = [self.new_kid_pos[0], self.new_kid_pos[1]-2, self.new_kid_pos[2], self.new_kid_pos[3]]
-        self.end = current[4]
-    
-    def new_create(self):
-        # print(self.barrier)
-        if self.new_barrier_pos != None :
-            temp  = []
-            for ba in self.new_barrier_pos:
-                if(ba[2]-2 > SIDE):
-                    temp.append([ba[0], ba[1], ba[2]-2, 91])
-            self.new_barrier_pos =  temp
-
-    def getnextState(self, current):
-        self.kid_pos = current[0]
-        self.barrier_pos = current[1]
-        self.new_kid_pos = current[2]
-        self.new_barrier_pos = current[3]
-        self.end = current[4]
-        self.score = current[5]
-        # print(self.kid_state)
 
 hell = Hell("是男人就下一百层", (SCREEN_WIDTH, SCREEN_HEIGHT))
 target_left=182
 dir=0
-current = 0;
-index = 2
 while True: 
+    for event in pygame.event.get():
+        hell.handle_input(event)
     
-    current = [hell.kid_pos, hell.barrier_pos, hell.new_kid_pos, hell.new_barrier_pos, hell.end, hell.score]
-    # print(current)
-    # for event in pygame.event.get():
-    #     hell.handle_input(event)
-    def Max_Value (game, d):
-        best_action = None
-        best_score = None
-        # print(type(game))
-        if game.end or d == game.depth:
-            return game.tget_score()
-        temp = []
-        for action in game.legalmove() :
-            # gameState1 = hell
-            # gameState1.move_man(action)
-            # print(action)
-            gameState1 = copy.deepcopy(game) 
+    '''def Max_Value (gameState, d):
+        if gameState.end or d == gameState.depth:
+            return gameState.tget_score()
+        temp=[]
+        for action in gameState.legalmove() :
+            gameState1=gameState
             gameState1.move_man(action)
-            # gameState1.update()
-            # gameState1.new_create()
-            state = [gameState1.new_kid_pos, gameState1.new_barrier_pos, gameState1.kid_pos, gameState1.barrier_pos, hell.end, gameState1.score]
-            # print(state)
-            next_state = gameState()
-            next_state.getnextState(state)
-            best_action = action
-            temp.append([best_action, Max_Value(next_state, d+1)])
-        return temp
+            temp.append(Max_Value(gameState1, d+1))
+        return max(temp)
 
 
     temp=[]
-    # for i in hell.legalmove():
-    #     hell1= deepcopy(hell)
-    #     hell1.move_man(i)
-    #     temp.append(Max_Value(hell1,0))
-    g = gameState()
-    g.getnextState(current)
-    # print(type(g))
-    temp = Max_Value(g, 0)
-    # print(temp)
-    maxscore = None
-    for i in temp:
-        if maxscore == None or i[1] > maxscore :
-            maxscore = i[1]
-    bestIndices = [index for index in temp if index[1] == maxscore]
-    # print(bestIndices)
-    chosenIndex = random.choice(bestIndices)
-    print(chosenIndex[0])
-    hell.move_man(chosenIndex[0])
+    for i in hell.legalmove():
+        hell1=hell
+        hell1.move_man(i)
+        temp.append(Max_Value(hell1,0))
+    
+    maxscore=max(temp)
+    bestIndices = [index for index in range(len(temp)) if temp[index] == maxscore]
+    chosenIndex = random.choice(bestIndices)'''
+    
+    for ba in hell.barrier: 
+            if ba.type in [SOLID,BELT_LEFT, BELT_RIGHT] :
+                if abs(182-ba.left)<abs(182-ba.left-91):
+                    if ba.rect.top-hell.body.top>abs(hell.body.left-ba.rect.left):
+                        target_left=ba.left+1
+                        dir=-1
+                else:
+                    if ba.rect.top-hell.body.top>abs(hell.body.left-ba.rect.left-91):
+                        target_left=ba.left+89
+                        dir=1
+                break
+            
+        
+    if hell.body.top<50:  
+        if dir==-1:
+            hell.dire=-1
+        else:
+            hell.dire=1
+    else:
+        if hell.body.left<target_left:
+            hell.dire=1
+        elif hell.body.left==target_left:
+            hell.dire=0
+        else:  
+            hell.dire=-1
+    
+    print (target_left)
     hell.timer.tick(hell.fps)
     hell.update()
     hell.draw()
-   
-
 
 
 

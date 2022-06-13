@@ -187,28 +187,4 @@ class Hell(game.Game):
 if __name__ == '__main__':
     hell = Hell("是男人就下一百层", (SCREEN_WIDTH, SCREEN_HEIGHT))
     hell.run()
-while True: 
-    for event in pygame.event.get():
-        hell.handle_input(event)
-
-    def Max_Value (gameState, d):
-        if gameState.end or d == gameState.depth:
-            return gameState.tget_score()
-        temp=[]
-        for action in gameState.legalmove() :
-            gameState1=gameState
-            gameState1.move_man(action)
-            temp.append(Max_Value(gameState1, d+1))
-        return max(temp)
-
-
-    temp=[]
-    for i in hell.legalmove():
-        hell1=hell
-        hell1.move_man(i)
-        temp.append(Max_Value(hell1,0))
-
-    maxscore=max(temp)
-    bestIndices = [index for index in range(len(temp)) if temp[index] == maxscore]
-    chosenIndex = random.choice(bestIndices)
 
