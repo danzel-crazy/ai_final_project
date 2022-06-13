@@ -404,9 +404,7 @@ def Max_Value (game, d):
             best_action = action
         if curReward == -1 and next_state.kid_pos[0] < 175:
             best_action = 1
-        elif curReward == -1 and next_state.kid_pos[0] >= 175
-        
-        :
+        elif curReward == -1 and next_state.kid_pos[0] >= 175:
             best_action = -1
         temp.append([best_action, Max_Value(next_state, d+1)])
     return temp
