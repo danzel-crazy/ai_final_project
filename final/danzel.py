@@ -125,7 +125,8 @@ class Hell(game.Game):
         self.draw()
         global average 
         average += self.score
-        # print(self.score)
+            
+        print(self.score)
 
     def move_man(self, dire):
         if dire == 0:
@@ -276,32 +277,35 @@ class gameState:
     def tget_score(self):
         reward = 0
         distance = 0
-
+        place = 0
         if self.new_barrier_pos != None:
             for ba in reversed(self.new_barrier_pos): 
-                # print(ba[0])
                 if ba[0] == SOLID :
-                    if(ba[1] >= 270):
-                        reward -= abs(ba[1] - self.new_kid_pos[0])
+                    distance = manhattan_distance([ba[1], ba[2]], [self.new_kid_pos[0], self.new_kid_pos[1]])
+                    if(ba[2] >= 270):
+                        reward -= abs(ba[1] - self.new_kid_pos[0]) *10 
                     else:
-                        reward -= abs(ba[1]+91 - self.new_kid_pos[0]-SIDE)
-                    # distance = manhattan_distance([ba[1]+91, ba[2]], [self.new_kid_pos[0], self.new_kid_pos[1]])
-                    # reward += distance
+                        reward -= abs(ba[1] - self.new_kid_pos[0]) *7
+                    
                 if ba[0] == BELT_LEFT :
-                    reward -= abs(ba[1] - self.new_kid_pos[0])
-                    # distance = manhattan_distance([ba[1]+91, ba[2]], [self.new_kid_pos[0], self.new_kid_pos[1]])
-                    # reward += distance
+                    if(ba[2] >= 270):
+                        reward -= abs(ba[1]+91 - self.new_kid_pos[0]-SIDE)*5 
+                    else:
+                        reward -= abs(ba[1]+91 - self.new_kid_pos[0]-SIDE)*3
                 if ba[0] == BELT_RIGHT :
-                    reward -= abs(ba[1]+91 - self.new_kid_pos[0])
-                    # distance = manhattan_distance([ba[1]+91, ba[2]], [self.new_kid_pos[0], self.new_kid_pos[1]])
-                    # reward += distance
+                    if(ba[2] >= 270):
+                        reward -= abs(ba[1] - self.new_kid_pos[0])*5
+                    else:
+                        reward -= abs(ba[1] - self.new_kid_pos[0])*3
+                    
                 if ba[0] == DEADLY :
-                    reward += abs(ba[1]+91 - self.new_kid_pos[0]-SIDE)
-                    # distance = manhattan_distance([ba[1]+91, ba[2]], [self.new_kid_pos[0], self.new_kid_pos[1]])
-                    # reward -= distance
+                    distance = manhattan_distance([ba[1]- (13*3), ba[2]+(13*3)], [self.new_kid_pos[0], self.new_kid_pos[1]])
+                    if ba[1] <= self.new_kid_pos[0] <= ba[1]+91:
+                        reward += abs(ba[1] - self.new_kid_pos[0])*3 
+                    else:
+                        reward += abs(ba[1]-SIDE - self.new_kid_pos[0]) 
+                
                 break
-        if(self.new_kid_pos[1] < 150):
-            reward *= 2
         # print(self.action)
         # print(reward)
         return reward       
@@ -363,7 +367,7 @@ while(index):
     dir=0
     current = 0;
     
-
+    i = 10
     while hell.end!=True: 
         for event in pygame.event.get():
             hell.handle_input(event)
@@ -420,7 +424,7 @@ while(index):
         hell.timer.tick(hell.fps)
         hell.update(temp[0])
         hell.draw()
-
+        
 print("average:", average/time)
    
 
