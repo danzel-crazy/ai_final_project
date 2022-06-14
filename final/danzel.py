@@ -244,7 +244,7 @@ class Hell(game.Game):
 class gameState:
     def __init__(self):
         self.end = 0
-        self.depth = 2
+        self.depth = 1
         self.kid_pos = None
         self.barrier_pos = None
         self.new_kid_pos = None
@@ -277,35 +277,37 @@ class gameState:
     def tget_score(self):
         reward = 0
         distance = 0
-        place = 0
+        
         if self.new_barrier_pos != None:
+            index = len(self.new_barrier_pos)
             for ba in reversed(self.new_barrier_pos): 
                 if ba[0] == SOLID :
                     distance = manhattan_distance([ba[1], ba[2]], [self.new_kid_pos[0], self.new_kid_pos[1]])
                     if(ba[2] >= 270):
-                        reward -= abs(ba[1] - self.new_kid_pos[0]) *10 
+                        reward -= abs(ba[1] - self.new_kid_pos[0]) 
                     else:
-                        reward -= abs(ba[1] - self.new_kid_pos[0]) *7
+                        reward -= abs(ba[1] - self.new_kid_pos[0]) 
                     
                 if ba[0] == BELT_LEFT :
                     if(ba[2] >= 270):
-                        reward -= abs(ba[1]+91 - self.new_kid_pos[0]-SIDE)*5 
+                        reward -= abs(ba[1]+91 - self.new_kid_pos[0]-SIDE) 
                     else:
-                        reward -= abs(ba[1]+91 - self.new_kid_pos[0]-SIDE)*3
+                        reward -= abs(ba[1]+91 - self.new_kid_pos[0]-SIDE)
                 if ba[0] == BELT_RIGHT :
                     if(ba[2] >= 270):
-                        reward -= abs(ba[1] - self.new_kid_pos[0])*5
+                        reward -= abs(ba[1] - self.new_kid_pos[0])
                     else:
-                        reward -= abs(ba[1] - self.new_kid_pos[0])*3
+                        reward -= abs(ba[1] - self.new_kid_pos[0])
                     
                 if ba[0] == DEADLY :
                     distance = manhattan_distance([ba[1]- (13*3), ba[2]+(13*3)], [self.new_kid_pos[0], self.new_kid_pos[1]])
                     if ba[1] <= self.new_kid_pos[0] <= ba[1]+91:
-                        reward += abs(ba[1] - self.new_kid_pos[0])*3 
+                        reward += abs(ba[1] - self.new_kid_pos[0])
                     else:
                         reward += abs(ba[1]-SIDE - self.new_kid_pos[0]) 
+                reward *= index
+                index -=1
                 
-                break
         # print(self.action)
         # print(reward)
         return reward       
@@ -362,7 +364,7 @@ while(index):
     # print(index)
     index -=1
     hell = Hell("是男人就下一百层", (SCREEN_WIDTH, SCREEN_HEIGHT))
-    # print(hell.end)
+    print(hell.end)
     target_left=182
     dir=0
     current = 0;

@@ -4,6 +4,9 @@
 公众号：Python代码大全
 '''
 from copy import copy, deepcopy
+from dataclasses import dataclass
+from logging.handlers import DatagramHandler
+from pickle import FALSE, TRUE
 import pygame
 import game
 from random import choice, randint
@@ -24,7 +27,7 @@ SCREEN_WIDTH = SIDE*GAME_COL
 SCREEN_HEIGHT = SIDE*GAME_ROW
 COLOR = {SOLID: 0x00ffff, FRAGILE: 0xff5500, DEADLY: 0xff2222, SCORE: 0xcccccc,
         BELT_LEFT: 0xffff44, BELT_RIGHT: 0xff99ff, BODY: 0x00ff00}
-CHOICE = [SOLID, SOLID, SOLID, FRAGILE, FRAGILE, BELT_LEFT, BELT_RIGHT, DEADLY]
+CHOICE = [SOLID, SOLID, SOLID, FRAGILE, FRAGILE, BELT_LEFT, BELT_RIGHT,DEADLY]
 
 
 class Barrier(object):
@@ -213,10 +216,12 @@ class Hell(game.Game):
 hell = Hell("是男人就下一百层", (SCREEN_WIDTH, SCREEN_HEIGHT))
 target_left=182
 dir=0
+jug=0
+
+
 while True: 
     for event in pygame.event.get():
         hell.handle_input(event)
-    
     '''def Max_Value (gameState, d):
         if gameState.end or d == gameState.depth:
             return gameState.tget_score()
@@ -237,34 +242,171 @@ while True:
     maxscore=max(temp)
     bestIndices = [index for index in range(len(temp)) if temp[index] == maxscore]
     chosenIndex = random.choice(bestIndices)'''
-    
+
+    drangel=[]
+    dranger=[]
+    dranget=[]
+    touch=0
     for ba in hell.barrier: 
-            if ba.type in [SOLID,BELT_LEFT, BELT_RIGHT] :
-                if abs(182-ba.left)<abs(182-ba.left-91):
-                    if ba.rect.top-hell.body.top>abs(hell.body.left-ba.rect.left):
-                        target_left=ba.left+1
-                        dir=-1
-                else:
-                    if ba.rect.top-hell.body.top>abs(hell.body.left-ba.rect.left-91):
-                        target_left=ba.left+89
-                        dir=1
-                break
-            
-        
-    if hell.body.top<50:  
-        if dir==-1:
-            hell.dire=-1
-        else:
-            hell.dire=1
-    else:
-        if hell.body.left<target_left:
-            hell.dire=1
-        elif hell.body.left==target_left:
-            hell.dire=0
-        else:  
-            hell.dire=-1
+        if ba.type in [DEADLY] :
+            if ba.rect.top>hell.body.top:
+                drangel.append(ba.rect.left)
+                dranger.append(ba.rect.left+91)
+                dranget.append(ba.rect.top)
+
+    i=0
+    for ba in hell.barrier: 
+        if ba.rect.top-15==hell.body.top :
+            touch=1
+            now=i
+        i=i+1
+
     
-    print (target_left)
+
+    target=[]
+    targett=[]
+    
+    #snipping
+    
+    if touch==0:
+
+            for ba in hell.barrier: 
+                if ba.type in [SOLID,BELT_LEFT, BELT_RIGHT] :
+                    if(ba.rect.top>hell.body.top):
+                        if(ba.rect.left>hell.body.left):
+                            if ba.rect.top-hell.body.top-5>abs(hell.body.left-ba.rect.left):
+                                if not len(drangel) ==0:
+                                    for i in range(len(drangel)):
+                                        temp=ba.rect.top-dranget[i]
+                                        if ba.rect.left>drangel[i]-5 and ba.rect.left<dranger[i]+5 and temp>0 :
+                                            print ("tes")
+                                            o=0
+                                        else:
+                                            target.append(ba.rect.left+2)
+                                        
+                                else:
+                                    target.append(ba.rect.left+2)
+                        if (ba.rect.left+90<=hell.body.left):
+                            if ba.rect.top-hell.body.top-5>abs(hell.body.left-ba.rect.left-91):
+                                if not len(drangel) ==0:
+                                    for i in range(len(drangel)):
+                                        temp=ba.rect.top-dranget[i]
+                                        if ba.rect.left+89>drangel[i]-5 and ba.rect.left+89<dranger[i]+5 and temp>0:
+                                            print ("tes3")
+                                            o=0
+                                        else:
+                                            target.append(ba.rect.left+87)
+                                else:
+                                    target.append(ba.rect.left+87)
+                        if(ba.rect.left<=hell.body.left):
+                            if ba.rect.top-hell.body.top-5>abs(hell.body.left-ba.rect.left):
+                                if not len(drangel) ==0:
+                                    for i in range(len(drangel)):
+                                        temp=ba.rect.top-dranget[i]
+                                        if ba.rect.left>drangel[i]-5 and ba.rect.left<dranger[i]+5 and temp>0 :
+                                            print ("tes1")
+                                            o=1
+                                        elif not ba.rect.left+89>drangel[i]-5 and ba.rect.left+89<dranger[i]+5 and temp>0:
+                                            target.append(ba.rect.left+2) 
+                                else:
+                                    target.append(ba.rect.left+2)
+                        if (ba.rect.left+90>hell.body.left):
+                            if ba.rect.top-hell.body.top-5>abs(hell.body.left-ba.rect.left-91):
+                                if not len(drangel) ==0:
+                                    for i in range(len(drangel)):
+                                        temp=ba.rect.top-dranget[i]
+                                        if ba.rect.left+89>drangel[i]-5 and ba.rect.left+89<dranger[i]+5 and temp>0 :
+                                            print ("tes2")
+                                            o=1
+                                        elif not ba.rect.left>drangel[i]-5 and ba.rect.left<dranger[i]+5 and temp>0 :
+                                            target.append(ba.rect.left+87)
+
+                                else:
+                                    target.append(ba.rect.left+87)
+
+
+
+
+            
+            if not len(target) == 0:
+                if touch == 0:
+                    min=1000
+                    index=0
+                    for i in range(len(target)):
+                        if min>abs(hell.body.left-target[i]):
+                            index=i
+                            min=abs(hell.body.left-target[i])
+                    target_left=target[index]
+            else:
+                if touch == 0:
+                    if not len(drangel) ==0:
+                        if hell.body.left>drangel[0]-20 and hell.body.left<dranger[0]+20:
+                            if  hell.body.left>drangel[0]+45:
+                                if drangel[0]+91>330:
+                                    hell.dire=-1
+                                else :
+                                    hell.dire=1
+                            else:
+                                if drangel[0]<20:
+                                    hell.dire=1
+                                else:
+                                    hell.dire=-1
+                        else:        
+                            hell.dire=0
+                    else:
+                        hell.dire=0
+
+
+    
+    
+      
+    
+    if touch == 1:
+
+        if jug <= 0 :
+            if not len(drangel) ==0:
+                if hell.barrier[now].rect.left>drangel[0] and hell.barrier[now].rect.left<dranger[0] and dranget[0]-hell.barrier[now].rect.top<200 and hell.barrier[now].rect.left+91<330:
+                    jug=3
+                    dir=1
+                elif hell.barrier[now].rect.left+91>drangel[0] and hell.barrier[now].rect.left+91<dranger[0] and dranget[0]-hell.barrier[now].rect.top<200 and hell.barrier[now].rect.left>30:
+                    jug=3
+                    dir=-1  
+                else:
+                    if hell.body.left<175:
+                        jug=3
+                        dir=1
+                    else:
+                        dir=-1
+                        jug=3
+            else:
+                if hell.body.left<175:
+                    jug=3
+                    dir=1
+                else:
+                    dir=-1
+                    jug=3
+        if hell.body.top<230:
+            if dir == 1:
+                hell.dire=1
+            else :
+                hell.dire=-1
+        else:
+            if hell.body.left<target_left:
+                hell.dire=1
+            elif hell.body.left-target_left<2:
+                hell.dire=0
+            else:  
+                hell.dire=-1
+
+    elif not len(target) ==0:
+        jug=jug-1
+        if hell.body.left<target_left:
+                hell.dire=1
+        elif hell.body.left==target_left:
+                hell.dire=0
+        else:  
+                hell.dire=-1
+
     hell.timer.tick(hell.fps)
     hell.update()
     hell.draw()
@@ -274,3 +416,45 @@ while True:
 
 
 
+'''
+if(ba.rect.top>hell.body.top):
+                        if(ba.rect.left>hell.body.left):
+                            if ba.rect.top-hell.body.top-5>abs(hell.body.left-ba.rect.left):
+                                #print ("yessss1")
+                                if not len(drangel) ==0:
+                                    for i in range(len(drangel)):
+                                        diff=ba.rect.top-dranget[i]
+                                        if not (ba.rect.left-diff<dranger[i]) and not  (ba.rect.left-diff>drangel[i]):
+                                            target.append(ba.rect.left+2)
+                                else:
+                                    target.append(ba.rect.left+2)
+                        elif(ba.rect.left<hell.body.left):
+                            if ba.rect.top-hell.body.top-5>abs(hell.body.left-ba.rect.left):
+                            #print ("yessss2")
+                                if not len(drangel) ==0:
+                                    for i in range(len(drangel)):
+                                        diff=ba.rect.top-dranget[i]
+                                        if not (ba.rect.left+diff<dranger[i]) and not  (ba.rect.left+diff>drangel[i]):
+                                            target.append(ba.rect.left+2)        
+                                else:
+                                    target.append(ba.rect.left+2)
+                        if (ba.rect.left+90>hell.body.left):
+                            if ba.rect.top-hell.body.top-5>abs(hell.body.left-ba.rect.left-91):
+                                if not len(drangel) ==0:
+                                    for i in range(len(drangel)):
+                                        diff=ba.rect.top-dranget[i]
+                                        if not (ba.rect.left+90-diff<dranger[i]) and not  (ba.rect.left+90-diff>drangel[i]):
+                                            target.append(ba.rect.left+89)
+
+                                else:
+                                    target.append(ba.rect.left+89)
+
+                        elif (ba.rect.left+90<hell.body.left):
+                            if ba.rect.top-hell.body.top-5>abs(hell.body.left-ba.rect.left-91):
+                                if not len(drangel) ==0:
+                                    for i in range(len(drangel)):
+                                        diff=ba.rect.top-dranget[i]
+                                        if not (ba.rect.left+90+diff<dranger[i]) and not  (ba.rect.left+90+diff>drangel[i]):
+                                            target.append(ba.rect.left+89)
+                                else:
+                                    target.append(ba.rect.left+89)'''
