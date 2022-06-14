@@ -126,7 +126,7 @@ class Hell(game.Game):
         global average 
         average += self.score
             
-        print(self.score)
+        # print(self.score)
 
     def move_man(self, dire):
         if dire == 0:
@@ -244,7 +244,7 @@ class Hell(game.Game):
 class gameState:
     def __init__(self):
         self.end = 0
-        self.depth = 1
+        self.depth = 5
         self.kid_pos = None
         self.barrier_pos = None
         self.new_kid_pos = None
@@ -364,7 +364,7 @@ while(index):
     # print(index)
     index -=1
     hell = Hell("是男人就下一百层", (SCREEN_WIDTH, SCREEN_HEIGHT))
-    print(hell.end)
+    # print(hell.end)
     target_left=182
     dir=0
     current = 0;

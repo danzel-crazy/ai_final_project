@@ -279,7 +279,7 @@ while True:
                                     for i in range(len(drangel)):
                                         temp=ba.rect.top-dranget[i]
                                         if ba.rect.left>drangel[i]-5 and ba.rect.left<dranger[i]+5 and temp>0 :
-                                            print ("tes")
+                                            # print ("tes")
                                             o=0
                                         else:
                                             target.append(ba.rect.left+2)
@@ -292,7 +292,7 @@ while True:
                                     for i in range(len(drangel)):
                                         temp=ba.rect.top-dranget[i]
                                         if ba.rect.left+89>drangel[i]-5 and ba.rect.left+89<dranger[i]+5 and temp>0:
-                                            print ("tes3")
+                                            # print ("tes3")
                                             o=0
                                         else:
                                             target.append(ba.rect.left+87)
@@ -304,7 +304,7 @@ while True:
                                     for i in range(len(drangel)):
                                         temp=ba.rect.top-dranget[i]
                                         if ba.rect.left>drangel[i]-5 and ba.rect.left<dranger[i]+5 and temp>0 :
-                                            print ("tes1")
+                                            # print ("tes1")
                                             o=1
                                         elif not ba.rect.left+89>drangel[i]-5 and ba.rect.left+89<dranger[i]+5 and temp>0:
                                             target.append(ba.rect.left+2) 
@@ -316,7 +316,7 @@ while True:
                                     for i in range(len(drangel)):
                                         temp=ba.rect.top-dranget[i]
                                         if ba.rect.left+89>drangel[i]-5 and ba.rect.left+89<dranger[i]+5 and temp>0 :
-                                            print ("tes2")
+                                            # print ("tes2")
                                             o=1
                                         elif not ba.rect.left>drangel[i]-5 and ba.rect.left<dranger[i]+5 and temp>0 :
                                             target.append(ba.rect.left+87)
